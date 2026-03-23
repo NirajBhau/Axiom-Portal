@@ -40,8 +40,17 @@ const WHITELIST = [
   { email: "vandanpatel4881@gmail.com", phone: "9173384391" },
 ];
 
-// MongoDB Schema
-const candidateSchema = new mongoose.Schema({
+interface ICandidate {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  token: string;
+  expiresAt: number;
+  isSubmitted: boolean;
+}
+
+const candidateSchema = new mongoose.Schema<ICandidate>({
   id: { type: String, required: true },
   name: { type: String, required: true },
   email: { type: String, required: true },
@@ -51,7 +60,7 @@ const candidateSchema = new mongoose.Schema({
   isSubmitted: { type: Boolean, default: false }
 });
 
-const CandidateModel = mongoose.models.Candidate || mongoose.model('Candidate', candidateSchema);
+const CandidateModel = mongoose.models.Candidate || mongoose.model<ICandidate>('Candidate', candidateSchema);
 
 const app = express();
 app.use(express.json());
