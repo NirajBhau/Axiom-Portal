@@ -51,7 +51,8 @@ const WHITELIST = [
   { email: "thanagalanagendra@gmail.com", phone: "8008668019" },
   { email: "bhasinkrishna4@gmail.com", phone: "9622606047" },
   { email: "shrutigaur757@gmail.com", phone: "9897903242" },
-  { email: "ritikakadam186@gmail.com", phone: "9359228737" }
+  { email: "ritikakadam186@gmail.com", phone: "9359228737" },
+  { email: "vandanpatel4881@gmail.com", phone: "9173384391" },
 ];
 
 // MongoDB Schema
@@ -124,8 +125,8 @@ async function startServer() {
       const token = `AXIOM-${year}-${randomPart}`;
       const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
 
-      const candidate = await CandidateModel.create({ 
-        id, name, email, phone, token, expiresAt, isSubmitted: false 
+      const candidate = await CandidateModel.create({
+        id, name, email, phone, token, expiresAt, isSubmitted: false
       });
 
       console.log(`Registered candidate: ${name} (${email}) with token: ${token}`);
@@ -183,7 +184,7 @@ async function startServer() {
       res.status(500).json({ error: 'Submission service error.' });
     }
   });
-  
+
   // Proctoring: Upload a webcam frame
   app.post('/api/proctor/upload-frame', async (req, res) => {
     const { token, image } = req.body;
@@ -210,7 +211,7 @@ async function startServer() {
       const filePath = path.join(recordingsDir, fileName);
 
       fs.writeFileSync(filePath, base64Data, 'base64');
-      
+
       console.log(`Saved proctoring frame for ${candidate.name} (${token}): ${fileName}`);
       res.json({ message: 'Frame uploaded successfully.' });
     } catch (err) {
