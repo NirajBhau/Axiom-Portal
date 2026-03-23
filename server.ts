@@ -52,7 +52,7 @@ const WHITELIST = [
   { email: "bhasinkrishna4@gmail.com", phone: "9622606047" },
   { email: "shrutigaur757@gmail.com", phone: "9897903242" },
   { email: "ritikakadam186@gmail.com", phone: "9359228737" },
-  { email: "vandanpatel4881@gmail.com", phone: "9173384391" },
+  { email: "vandanpatel4882@gmail.com", phone: "9173384392" },
 ];
 
 // MongoDB Schema
