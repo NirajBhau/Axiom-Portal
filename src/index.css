@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-label: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary: #005bbf;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1a73e8;
+  --color-on-primary-container: #ffffff;
+  --color-primary-fixed: #d8e2ff;
+  --color-primary-fixed-dim: #adc7ff;
+  --color-on-primary-fixed: #001a41;
+  --color-on-primary-fixed-variant: #004493;
+
+  --color-secondary: #5b00df;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #7531ff;
+  --color-on-secondary-container: #eadfff;
+  --color-secondary-fixed: #e8ddff;
+  --color-secondary-fixed-dim: #cfbdff;
+  --color-on-secondary-fixed: #22005d;
+  --color-on-secondary-fixed-variant: #5300cd;
+
+  --color-tertiary: #6833ea;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #8155ff;
+  --color-on-tertiary-container: #060021;
+  --color-tertiary-fixed: #e8deff;
+  --color-tertiary-fixed-dim: #cdbdff;
+  --color-on-tertiary-fixed: #20005f;
+  --color-on-tertiary-fixed-variant: #4f00d0;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-surface: #f8f9fa;
+  --color-on-surface: #191c1d;
+  --color-surface-variant: #e1e3e4;
+  --color-on-surface-variant: #414754;
+  --color-surface-dim: #d9dadb;
+  --color-surface-bright: #f8f9fa;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f4f5;
+  --color-surface-container: #edeeef;
+  --color-surface-container-high: #e7e8e9;
+  --color-surface-container-highest: #e1e3e4;
+
+  --color-outline: #727785;
+  --color-outline-variant: #c1c6d6;
+  --color-inverse-surface: #2e3132;
+  --color-inverse-on-surface: #f0f1f2;
+  --color-inverse-primary: #adc7ff;
+  --color-background: #f8f9fa;
+  --color-on-background: #191c1d;
+
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+}
+
+@layer utilities {
+  .kinetic-accent {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  }
+  
+  .kinetic-accent-border {
+    position: relative;
+  }
+  
+  .kinetic-accent-border::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 15%;
+    height: 70%;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--color-secondary), var(--color-tertiary));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .kinetic-accent-border:focus-within::before {
+    opacity: 1;
+  }
+
+  .glass-timer-pill {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  @keyframes scan {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(180px); }
+  }
+}

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: axiom-proctor
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromConfigVar: MONGODB_URI
+      - key: PORT
+        value: 10000

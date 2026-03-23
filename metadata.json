@@ -1,0 +1,8 @@
+{
+  "name": "Axiom Assessment Portal",
+  "description": "A high-stakes professional proctoring environment for quantitative reasoning assessments featuring real-time environment validation and integrity monitoring.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
