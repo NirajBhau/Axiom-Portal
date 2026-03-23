@@ -669,9 +669,18 @@ export default function App() {
       const base64Image = canvas.toDataURL('image/jpeg', 0.5); // full base64 with prefix
       setLastCapturedFrame(base64Image);
 
-      // Smart-Node Monitoring Active: Real-time analysis only, storage disabled for performance
+      // Upload to server for persistence in MongoDB
+      await fetch('/api/proctor/upload-frame', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: accessToken,
+          image: base64Image
+        })
+      });
+
       setIntegrityStatus("Smart-Node Monitoring Active");
-      console.log("Integrity heartbeat verified.");
+      console.log("Integrity heartbeat verified and frame uploaded.");
 
     } catch (err) {
       console.error('Integrity check/upload failed:', err);
