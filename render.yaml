@@ -9,6 +9,6 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        fromConfigVar: MONGODB_URI
+        sync: false
       - key: PORT
         value: 10000
