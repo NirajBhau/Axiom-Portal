@@ -62,6 +62,21 @@ const candidateSchema = new mongoose.Schema<ICandidate>({
 
 const CandidateModel = mongoose.models.Candidate || mongoose.model<ICandidate>('Candidate', candidateSchema);
 
+// Proctoring Frame Schema
+interface IFrame {
+  token: string;
+  image: string; // Base64
+  createdAt: Date;
+}
+
+const frameSchema = new mongoose.Schema<IFrame>({
+  token: { type: String, required: true, index: true },
+  image: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const FrameModel = mongoose.models.Frame || mongoose.model<IFrame>('Frame', frameSchema);
+
 const app = express();
 app.use(express.json());
 
@@ -154,13 +169,17 @@ app.post('/api/proctor/upload-frame', async (req, res) => {
   if (!candidate) return res.status(401).json({ error: 'Invalid session.' });
 
   try {
-    // Note: Vercel has a read-only filesystem. For proctoring frames, 
-    // we would ideally use S3 or Cloudinary. 
-    // For now, we'll log it, but local disk writes won't persist on Vercel.
-    console.log(`Frame received for candidate: ${candidate.name} (${token})`);
-    res.json({ message: 'Frame processed (non-persistent on Vercel).' });
+    await FrameModel.create({
+      token: token.toUpperCase(),
+      image, // Store the full base64 string
+      createdAt: new Date()
+    });
+
+    console.log(`Frame saved to DB for candidate ${candidate.name} (${token})`);
+    res.json({ message: 'Frame uploaded and persisted successfully.' });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to process frame.' });
+    console.error('Error saving proctoring frame to DB:', err);
+    res.status(500).json({ error: 'Failed to save frame to database.' });
   }
 });
 
