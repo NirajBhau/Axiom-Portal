@@ -429,6 +429,25 @@ export default function App() {
   const finalizeSubmission = async () => {
     setShowExitConfirm(false);
     setShowSubmitConfirm(false);
+
+    // Explicit hardware release on submission
+    if (webcamStreamRef.current) {
+      webcamStreamRef.current.getTracks().forEach(track => track.stop());
+      webcamStreamRef.current = null;
+    }
+    if (audioStreamRef.current) {
+      audioStreamRef.current.getTracks().forEach(track => track.stop());
+      audioStreamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(console.error);
+      audioContextRef.current = null;
+    }
+    if (audioAnimationFrameRef.current) {
+      cancelAnimationFrame(audioAnimationFrameRef.current);
+      audioAnimationFrameRef.current = null;
+    }
+
     try {
       await fetch('/api/exam/submit', {
         method: 'POST',
@@ -516,6 +535,11 @@ export default function App() {
   const [lastCapturedFrame, setLastCapturedFrame] = useState<string | null>(null);
   const [activeMediaStream, setActiveMediaStream] = useState<MediaStream | null>(null);
 
+  const webcamStreamRef = React.useRef<MediaStream | null>(null);
+  const audioStreamRef = React.useRef<MediaStream | null>(null);
+  const audioContextRef = React.useRef<AudioContext | null>(null);
+  const audioAnimationFrameRef = React.useRef<number | null>(null);
+
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
@@ -538,12 +562,16 @@ export default function App() {
 
   // Webcam Stream Management
   const startWebcam = useCallback(async () => {
+    if (webcamStreamRef.current && webcamStreamRef.current.getVideoTracks().some(t => t.readyState === 'live')) {
+      return webcamStreamRef.current;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      webcamStreamRef.current = stream;
+      setActiveMediaStream(stream);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
-      setActiveMediaStream(stream);
       setValidationProgress(prev => ({ ...prev, camera: true, cameraError: false }));
       return stream;
     } catch (err) {
@@ -554,15 +582,21 @@ export default function App() {
   }, [videoRef]);
 
   const startAudio = useCallback(async () => {
-    let audioContext: AudioContext | null = null;
-    let analyser: AnalyserNode | null = null;
-    let stream: MediaStream | null = null;
-    let animationFrame: number;
-
+    if (audioStreamRef.current && audioStreamRef.current.getAudioTracks().some(t => t.readyState === 'live')) {
+      return {
+        stream: audioStreamRef.current,
+        audioContext: audioContextRef.current!,
+        animationFrame: audioAnimationFrameRef.current!
+      };
+    }
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioContext = new AudioContext();
-      analyser = audioContext.createAnalyser();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioStreamRef.current = stream;
+      
+      const audioContext = new AudioContext();
+      audioContextRef.current = audioContext;
+      
+      const analyser = audioContext.createAnalyser();
       const source = audioContext.createMediaStreamSource(stream);
       source.connect(analyser);
       analyser.fftSize = 256;
@@ -570,7 +604,7 @@ export default function App() {
       const dataArray = new Uint8Array(bufferLength);
 
       const updateLevel = () => {
-        if (!analyser) return;
+        if (!analyser || audioContext.state === 'closed') return;
         analyser.getByteFrequencyData(dataArray);
         let sum = 0;
         for (let i = 0; i < bufferLength; i++) {
@@ -578,12 +612,12 @@ export default function App() {
         }
         const average = sum / bufferLength;
         setAudioLevel(Math.min(100, (average / 128) * 100));
-        animationFrame = requestAnimationFrame(updateLevel);
+        audioAnimationFrameRef.current = requestAnimationFrame(updateLevel);
       };
 
       updateLevel();
       setValidationProgress(prev => ({ ...prev, audio: true, audioError: false }));
-      return { stream, audioContext, animationFrame };
+      return { stream, audioContext, animationFrame: audioAnimationFrameRef.current! };
     } catch (err) {
       console.error('Microphone access denied:', err);
       setValidationProgress(prev => ({ ...prev, audio: false, audioError: true }));
@@ -604,22 +638,16 @@ export default function App() {
 
   // Unified permission effect with Auto-Detection
   useEffect(() => {
-    let activeWebcamStream: MediaStream | null = null;
-    let activeAudioResources: { stream: MediaStream; audioContext: AudioContext; animationFrame: number } | null = null;
     let pollInterval: NodeJS.Timeout;
 
     const checkPermissions = async () => {
       // Check Webcam
       if (!validationProgress.camera) {
-        const s = await startWebcam();
-        if (s) activeWebcamStream = s;
-        else if (!showPermissionModal) setShowPermissionModal(true);
+        await startWebcam();
       }
       // Check Audio
       if (!validationProgress.audio) {
-        const res = await startAudio();
-        if (res) activeAudioResources = res;
-        else if (!showPermissionModal) setShowPermissionModal(true);
+        await startAudio();
       }
     };
 
@@ -631,9 +659,8 @@ export default function App() {
       ]).then(([camStatus, micStatus]) => {
         const onPermissionChange = () => {
           if (camStatus.state === 'granted' && micStatus.state === 'granted') {
-             // Browser often requires reload to release devices after grant
-             // We do it automatically so user doesn't have to click manual refresh
-             setTimeout(() => window.location.reload(), 1000);
+             // Instead of reload, just check permissions immediately
+             checkPermissions();
           }
         };
         camStatus.onchange = onPermissionChange;
@@ -653,16 +680,30 @@ export default function App() {
 
     return () => {
       if (pollInterval) clearInterval(pollInterval);
-      if (activeWebcamStream) {
-        activeWebcamStream.getTracks().forEach(track => track.stop());
+    };
+  }, [screen, startWebcam, startAudio, validationProgress.camera, validationProgress.audio]);
+
+  // Global hardware release on unmount or when the exam completes
+  useEffect(() => {
+    return () => {
+      if (webcamStreamRef.current) {
+        webcamStreamRef.current.getTracks().forEach(track => track.stop());
+        webcamStreamRef.current = null;
       }
-      if (activeAudioResources) {
-        cancelAnimationFrame(activeAudioResources.animationFrame);
-        activeAudioResources.audioContext.close();
-        activeAudioResources.stream.getTracks().forEach(t => t.stop());
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => track.stop());
+        audioStreamRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(console.error);
+        audioContextRef.current = null;
+      }
+      if (audioAnimationFrameRef.current) {
+        cancelAnimationFrame(audioAnimationFrameRef.current);
+        audioAnimationFrameRef.current = null;
       }
     };
-  }, [screen, startWebcam, startAudio, validationProgress.camera, validationProgress.audio, showPermissionModal]);
+  }, []);
 
 
   // Record & Review Integrity Check
@@ -813,15 +854,16 @@ export default function App() {
     };
   }, [screen]);
 
-  const enterFullScreen = async () => {
-    try {
-      const element = document.documentElement;
-      if (element.requestFullscreen) {
-        await element.requestFullscreen();
-        setShowFullScreenAlert(false);
-      }
-    } catch (err) {
-      console.error('Error attempting to enable full-screen mode:', err);
+  const enterFullScreen = () => {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      element.requestFullscreen()
+        .then(() => {
+          setShowFullScreenAlert(false);
+        })
+        .catch(err => {
+          console.error('Error attempting to enable full-screen mode:', err);
+        });
     }
   };
 
@@ -845,9 +887,9 @@ export default function App() {
     if (isAgreed) setScreen('validation');
   };
 
-  const handleStartExam = async () => {
-    // 1. Immediate Fullscreen Attempt (Must be before any awaits)
-    await enterFullScreen();
+  const handleStartExam = () => {
+    // 1. Immediate Fullscreen Attempt (Non-blocking)
+    enterFullScreen();
 
     // 2. Security Check 
     if (!validationProgress.camera || !validationProgress.audio) {
