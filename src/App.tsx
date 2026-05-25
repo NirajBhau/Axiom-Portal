@@ -385,6 +385,23 @@ export default function App() {
   const [isSubmitted, setIsSubmitted] = useState<boolean>(() => {
     return localStorage.getItem('axiom_exam_submitted') === 'true';
   });
+
+  // Check for reset query parameter to clear local submission blocks
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reset') === 'true') {
+      localStorage.removeItem('axiom_exam_submitted');
+      localStorage.removeItem('axiom_exam_autosave');
+      sessionStorage.clear();
+      setIsSubmitted(false);
+      
+      // Clean up the URL parameter to prevent endless resets
+      const url = new URL(window.location.href);
+      url.searchParams.delete('reset');
+      window.history.replaceState({}, document.title, url.pathname + url.search);
+    }
+  }, []);
+
   // --- State ---
   const [screen, setScreen] = useState<Screen>(() => (sessionStorage.getItem('exam_screen') as Screen) || 'access');
   const [candidateName, setCandidateName] = useState(() => sessionStorage.getItem('exam_name') || '');
