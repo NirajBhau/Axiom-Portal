@@ -433,7 +433,7 @@ export default function App() {
       await fetch('/api/exam/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: accessToken })
+        body: JSON.stringify({ token: accessToken, answers })
       });
     } catch (err) {
       console.error('Submission error (ignoring for UX):', err);

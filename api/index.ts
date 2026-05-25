@@ -49,6 +49,8 @@ interface ICandidate {
   token: string;
   expiresAt: number;
   isSubmitted: boolean;
+  answers?: any;
+  score?: any;
 }
 
 const candidateSchema = new mongoose.Schema<ICandidate>({
@@ -58,7 +60,9 @@ const candidateSchema = new mongoose.Schema<ICandidate>({
   phone: { type: String, required: true },
   token: { type: String, required: true, unique: true },
   expiresAt: { type: Number, required: true },
-  isSubmitted: { type: Boolean, default: false }
+  isSubmitted: { type: Boolean, default: false },
+  answers: { type: mongoose.Schema.Types.Mixed, default: {} },
+  score: { type: mongoose.Schema.Types.Mixed, default: {} }
 });
 
 const CandidateModel = mongoose.models.Candidate || mongoose.model<ICandidate>('Candidate', candidateSchema);
@@ -149,12 +153,48 @@ app.post('/api/auth/verify-token', async (req, res) => {
   }
 });
 
+const CORRECT_ANSWERS: Record<number, number> = {
+  1: 0, 2: 1, 3: 1, 4: 0, 5: 1,      // Quant
+  6: 1, 7: 1, 8: 0, 9: 3, 10: 3,     // Logical
+  11: 2, 12: 2, 13: 1, 14: 2, 15: 1, // DI
+  16: 1, 17: 1, 18: 3, 19: 0, 20: 1  // Analytics
+};
+
+function calculateScore(answers: any) {
+  let total = 0;
+  const sections: Record<string, number> = { quant: 0, logical: 0, di: 0, analytics: 0 };
+  
+  if (!answers) return { total, sections };
+
+  for (const sectionId of Object.keys(answers)) {
+    const sectionAnswers = answers[sectionId] || {};
+    for (const qIdStr of Object.keys(sectionAnswers)) {
+      const qId = Number(qIdStr);
+      const chosenOption = sectionAnswers[qIdStr];
+      const correctOption = CORRECT_ANSWERS[qId];
+      if (chosenOption !== undefined && chosenOption === correctOption) {
+        total++;
+        if (sections[sectionId] !== undefined) {
+          sections[sectionId]++;
+        }
+      }
+    }
+  }
+
+  return { total, sections };
+}
+
 app.post('/api/exam/submit', async (req, res) => {
-  const { token } = req.body;
+  const { token, answers } = req.body;
   if (!token) return res.status(400).json({ error: 'Token is required.' });
 
   try {
-    const candidate = await CandidateModel.findOneAndUpdate({ token: token.toUpperCase() }, { isSubmitted: true }, { new: true });
+    const score = calculateScore(answers);
+    const candidate = await CandidateModel.findOneAndUpdate(
+      { token: token.toUpperCase() }, 
+      { isSubmitted: true, answers: answers || {}, score }, 
+      { new: true }
+    );
     if (!candidate) return res.status(404).json({ error: 'Token not found.' });
     res.json({ message: 'Exam submitted successfully.' });
   } catch (err) {
