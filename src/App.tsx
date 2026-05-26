@@ -258,7 +258,7 @@ const Header = ({ screen, timeLeft, onFinish, sectionName, violations }: { scree
         </div>
         <div className="flex flex-col">
           <h1 className="font-headline tracking-tight font-extrabold text-lg md:text-xl leading-none uppercase">
-            {isAccess ? 'THE COGNITIVE ATELIER' : 'AXIOM PROCTOR'}
+            AXIOM PROCTOR
           </h1>
           {isExam && <span className="text-[8px] font-mono text-primary font-bold tracking-[0.3em] uppercase mt-1">Section: {sectionName}</span>}
         </div>
@@ -1075,7 +1075,7 @@ export default function App() {
             <span className="text-[10px] font-mono text-primary font-bold tracking-[0.3em] uppercase">Secure Node Portal</span>
           </div>
           <h1 className="font-headline text-5xl font-extrabold text-white leading-[1.0] tracking-tighter mb-4">
-            THE COGNITIVE<br/>ATELIER
+            AXIOM<br/>PROCTOR
           </h1>
           <p className="text-slate-400 font-body text-sm max-w-sm leading-relaxed mb-8">
             Please follow these simple steps to register, verify your identity, and begin your secure assessment session.
@@ -1384,7 +1384,7 @@ export default function App() {
             Environment <br/>Validation
           </h1>
           <p className="text-on-surface-variant text-lg leading-relaxed">
-            The Cognitive Atelier requires a secure and stable connection to maintain proctoring integrity. Please remain still during the checks.
+            Axiom Proctor requires a secure and stable connection to maintain proctoring integrity. Please remain still during the checks.
           </p>
           <div className="bg-surface-container-low p-6 rounded-xl border-l-4 border-secondary space-y-4">
             <div>
