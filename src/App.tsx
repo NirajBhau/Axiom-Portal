@@ -416,7 +416,7 @@ export default function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, Record<number, number>>>({});
   const [markedForReview, setMarkedForReview] = useState<Record<string, Record<number, boolean>>>({});
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('+91 ');
   const [email, setEmail] = useState('');
   const [accessError, setAccessError] = useState('');
   const [fullName, setFullName] = useState('');
@@ -993,8 +993,8 @@ export default function App() {
     }
 
     // Phone Number Validation (Simple check for 10+ digits)
-    const phoneRegex = /^\+?[\d\s-]{10,}$/;
-    if (!phoneRegex.test(phoneNumber)) {
+    const normalizedPhone = phoneNumber.replace(/\D/g, '').slice(-10);
+    if (normalizedPhone.length !== 10) {
       setAccessError('Please enter a valid phone number (at least 10 digits).');
       setIsAccessing(false);
       return;
@@ -1004,7 +1004,7 @@ export default function App() {
       const response = await fetch('/api/auth/verify-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, phone: phoneNumber, token: accessToken })
+        body: JSON.stringify({ email, phone: normalizedPhone, token: accessToken })
       });
 
       const data = await response.json();
@@ -1030,11 +1030,18 @@ export default function App() {
     setAccessError('');
     setIsAccessing(true);
 
+    const normalizedPhone = phoneNumber.replace(/\D/g, '').slice(-10);
+    if (normalizedPhone.length !== 10) {
+      setAccessError('Please enter a valid phone number (at least 10 digits).');
+      setIsAccessing(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/candidates/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: fullName, email, phone: phoneNumber })
+        body: JSON.stringify({ name: fullName, email, phone: normalizedPhone })
       });
 
       const data = await response.json();
@@ -1223,7 +1230,7 @@ export default function App() {
               <input 
                 className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body" 
                 id="phone" 
-                placeholder="+1 (555) 000-0000" 
+                placeholder="+91 98765 43210" 
                 type="tel"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
