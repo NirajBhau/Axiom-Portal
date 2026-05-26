@@ -416,7 +416,7 @@ export default function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, Record<number, number>>>({});
   const [markedForReview, setMarkedForReview] = useState<Record<string, Record<number, boolean>>>({});
-  const [phoneNumber, setPhoneNumber] = useState('+91 ');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [accessError, setAccessError] = useState('');
   const [fullName, setFullName] = useState('');
@@ -1227,15 +1227,24 @@ export default function App() {
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1" htmlFor="phone">Phone Number</label>
-              <input 
-                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body" 
-                id="phone" 
-                placeholder="+91 98765 43210" 
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-              />
+              <div className="relative flex items-center">
+                <span className="absolute left-4 text-on-surface-variant font-body font-semibold select-none pointer-events-none text-slate-500">
+                  +91
+                </span>
+                <input 
+                  className="w-full bg-white border border-outline-variant rounded-lg pl-14 pr-4 py-3.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body" 
+                  id="phone" 
+                  placeholder="98765 43210" 
+                  type="tel"
+                  maxLength={10}
+                  value={phoneNumber}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setPhoneNumber(val);
+                  }}
+                  required
+                />
+              </div>
             </div>
             
             {!isRegistering && (
