@@ -39,6 +39,7 @@ const WHITELIST = [
   { email: "ritikakadam186@gmail.com", phone: "9359228737" },
   { email: "vandanpatel4882@gmail.com", phone: "9173384392" },
   { email: "69nirajpatil@gmail.com", phone: "9724249244" },
+  { email: "shelkekaran01@gmail.com", phone: "9545021393" },
 ];
 
 interface ICandidate {
