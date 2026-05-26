@@ -425,6 +425,7 @@ export default function App() {
   const [isAccessing, setIsAccessing] = useState(false);
   const [showSectionConfirm, setShowSectionConfirm] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ show: false, title: '', message: '' });
+  const [showGuideModal, setShowGuideModal] = useState(false);
 
   const finalizeSubmission = async () => {
     setShowExitConfirm(false);
@@ -1058,8 +1059,8 @@ export default function App() {
 
   const renderAccess = () => (
     <main className="flex-grow flex flex-col md:flex-row h-full overflow-hidden">
-      {/* Left Pane: Brand & Visual */}
-      <div className="hidden md:flex md:w-1/2 bg-slate-950 relative overflow-hidden flex-col justify-between p-16">
+      {/* Left Pane: Steps and Brand */}
+      <div className="hidden md:flex md:w-1/2 bg-slate-950 relative overflow-hidden flex-col justify-between p-12">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-primary blur-[120px] rounded-full"></div>
           <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-secondary blur-[100px] rounded-full"></div>
@@ -1067,40 +1068,83 @@ export default function App() {
         </div>
         
         <div className="relative z-10">
-          <div className="w-12 h-12 kinetic-accent rounded-xl flex items-center justify-center text-white mb-8">
-            <ShieldCheck size={24} />
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 kinetic-accent rounded-lg flex items-center justify-center text-white">
+              <ShieldCheck size={20} />
+            </div>
+            <span className="text-[10px] font-mono text-primary font-bold tracking-[0.3em] uppercase">Secure Node Portal</span>
           </div>
-          <h1 className="font-headline text-6xl font-extrabold text-white leading-[0.9] tracking-tighter mb-6">
-            AXIOM<br/>PROCTOR
+          <h1 className="font-headline text-5xl font-extrabold text-white leading-[1.0] tracking-tighter mb-4">
+            THE COGNITIVE<br/>ATELIER
           </h1>
-          <p className="text-slate-400 font-body text-lg max-w-md leading-relaxed">
-            Advanced AI-driven proctoring environment for secure, high-stakes professional assessments.
+          <p className="text-slate-400 font-body text-sm max-w-sm leading-relaxed mb-8">
+            Please follow these simple steps to register, verify your identity, and begin your secure assessment session.
           </p>
         </div>
 
-        <div className="relative z-10 flex flex-col gap-8">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/60">
-              <ShieldCheck size={18} />
+        {/* Step-by-Step Vertical Guide */}
+        <div className="relative z-10 flex flex-col gap-6 max-w-md py-4">
+          <div className="flex items-start gap-4">
+            <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary text-xs font-mono font-bold shrink-0 mt-0.5">
+              01
             </div>
             <div>
-              <p className="text-white text-sm font-bold uppercase tracking-widest">Biometric Integrity</p>
-              <p className="text-slate-500 text-xs">Continuous facial and gaze tracking</p>
+              <p className="text-white text-xs font-extrabold uppercase tracking-wider mb-1">Step 1: Register Account</p>
+              <p className="text-slate-400 text-xs leading-relaxed font-body">
+                Click <strong className="text-primary font-bold">"Need a token? Register here"</strong>. Fill in your Name, Email, and Phone Number (must be whitelisted).
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/60">
-              <LayoutGrid size={18} />
+
+          <div className="w-[1px] h-6 bg-slate-800 ml-4 -my-4"></div>
+
+          <div className="flex items-start gap-4">
+            <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary text-xs font-mono font-bold shrink-0 mt-0.5">
+              02
             </div>
             <div>
-              <p className="text-white text-sm font-bold uppercase tracking-widest">Environment Scan</p>
-              <p className="text-slate-500 text-xs">Multi-sensor room validation</p>
+              <p className="text-white text-xs font-extrabold uppercase tracking-wider mb-1">Step 2: Generate Access Token</p>
+              <p className="text-slate-400 text-xs leading-relaxed font-body">
+                Click <strong className="text-primary font-bold">"Register & Generate Token"</strong>. Copy and save the unique token generated specifically for you.
+              </p>
+            </div>
+          </div>
+
+          <div className="w-[1px] h-6 bg-slate-800 ml-4 -my-4"></div>
+
+          <div className="flex items-start gap-4">
+            <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary text-xs font-mono font-bold shrink-0 mt-0.5">
+              03
+            </div>
+            <div>
+              <p className="text-white text-xs font-extrabold uppercase tracking-wider mb-1">Step 3: Secure Sign In</p>
+              <p className="text-slate-400 text-xs leading-relaxed font-body">
+                Toggle back to sign in, enter your Email, Phone Number, and your Access Token, then click <strong className="text-primary font-bold">"Access Secure Node"</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div className="w-[1px] h-6 bg-slate-800 ml-4 -my-4"></div>
+
+          <div className="flex items-start gap-4">
+            <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary text-xs font-mono font-bold shrink-0 mt-0.5">
+              04
+            </div>
+            <div>
+              <p className="text-white text-xs font-extrabold uppercase tracking-wider mb-1">Step 4: Calibrate Hardware</p>
+              <p className="text-slate-400 text-xs leading-relaxed font-body">
+                Agree to rules and click "Start Test". Allow the browser to access your webcam and microphone for proctoring validation.
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="absolute bottom-0 right-0 p-8">
-          <p className="text-slate-800 font-headline text-8xl font-black leading-none select-none">01</p>
+        <div className="relative z-10 flex justify-between items-center border-t border-white/5 pt-6 mt-6">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Integrity Monitoring Active</span>
+          </div>
+          <span className="text-[9px] font-mono text-slate-600 uppercase">System Ready</span>
         </div>
       </div>
 
@@ -1116,6 +1160,13 @@ export default function App() {
                 ? 'Register your details to receive an access token.' 
                 : 'Enter your credentials to initialize the session.'}
             </p>
+            <button
+              type="button"
+              onClick={() => setShowGuideModal(true)}
+              className="mt-4 flex items-center gap-1.5 text-[10px] font-extrabold text-primary hover:underline uppercase tracking-widest"
+            >
+              <Info size={14} /> View Step-by-Step Access Guide
+            </button>
           </div>
 
           {registrationSuccess && (
@@ -2137,6 +2188,100 @@ export default function App() {
               <p className="text-center mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                 Protected by Axiom AI Integrity Guard
               </p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Step-by-Step Guide Modal for Mobile/All users */}
+      <AnimatePresence>
+        {showGuideModal && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+              onClick={() => setShowGuideModal(false)}
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl relative z-10 p-8 border border-slate-100"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                    <ShieldCheck size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-headline text-xl font-extrabold text-slate-900 tracking-tight">Access Guide</h3>
+                    <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold font-mono">How to start the test</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowGuideModal(false)}
+                  className="text-slate-400 hover:text-slate-600 font-extrabold text-lg p-1"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-6 mb-8 max-h-[60vh] overflow-y-auto pr-2">
+                <div className="flex gap-4">
+                  <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 text-slate-600">1</div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-950 uppercase tracking-wide mb-1">Step 1: Register Your Account</p>
+                    <p className="text-xs text-slate-600 leading-relaxed font-body">
+                      Click "Need a token? Register here". Fill in your Name, Email, and Phone Number (which must be whitelisted).
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 text-slate-600">2</div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-950 uppercase tracking-wide mb-1">Step 2: Generate Access Token</p>
+                    <p className="text-xs text-slate-600 leading-relaxed font-body">
+                      Click "Register & Generate Token". Copy and save the generated token code (e.g. AXIOM-2026-XXXX).
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 text-slate-600">3</div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-950 uppercase tracking-wide mb-1">Step 3: Secure Sign In</p>
+                    <p className="text-xs text-slate-600 leading-relaxed font-body">
+                      Click "Already have a token? Sign In". Enter your Email, Phone Number, and the generated Access Token, then click "Access Secure Node".
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 text-slate-600">4</div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-950 uppercase tracking-wide mb-1">Step 4: Calibrate Hardware</p>
+                    <p className="text-xs text-slate-600 leading-relaxed font-body">
+                      Agree to the instructions and click "Start Test". Allow the browser to access your webcam and microphone for proctoring checks.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 text-slate-600">5</div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-950 uppercase tracking-wide mb-1">Step 5: Start the Test</p>
+                    <p className="text-xs text-slate-600 leading-relaxed font-body">
+                      Wait for hardware checks (webcam, mic, network) to turn green. Click "All set, Start Exam" to enter fullscreen mode and start!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowGuideModal(false)}
+                className="w-full py-4 bg-slate-950 hover:bg-primary text-white rounded-xl font-bold uppercase tracking-widest text-xs transition-all active:scale-[0.98] shadow-lg shadow-slate-950/20"
+              >
+                Got It, Let's Start
+              </button>
             </motion.div>
           </div>
         )}
